@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadpool: Challenge de 20 Segundos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --dp-red: #8a0303;
+            --dp-bright-red: #ff0000;
+            --dp-black: #121212;
+            --dp-gray: #2c2c2c;
+            --text-color: #f0f0f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: #000;
+            background-image: radial-gradient(circle at center, #1a0000 0%, #000 100%);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: var(--dp-black);
+            border: 3px solid var(--dp-red);
+            border-radius: 20px;
+            padding: 25px;
+            width: 95%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Bangers', cursive;
+            font-size: 2.5rem;
+            color: var(--dp-bright-red);
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 0 #fff;
+            letter-spacing: 2px;
+        }
+
+        .mask-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Barra de Tiempo */
+        .timer-container {
+            width: 100%;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--dp-bright-red);
+            transition: width 1s linear;
+        }
+
+        .timer-text {
+            font-weight: bold;
+            color: var(--dp-bright-red);
+            font-size: 1.2rem;
+        }
+
+        /* Botones */
+        .btn-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: var(--dp-red);
+            color: white;
+            border: 1px solid #444;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: var(--dp-bright-red);
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Estados de Pantalla */
+        .hide { display: none; }
+
+        .question-box {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Premio y Resultado */
+        .prize-box {
+            border: 2px dashed #4caf50;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            background: #0f1f0f;
+        }
+
+        .winner-code {
+            font-family: monospace;
+            font-size: 1.5rem;
+            color: #4caf50;
+            background: #000;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #4caf50;
+            letter-spacing: 3px;
+        }
+
+        .whatsapp-btn {
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 15px;
+            font-family: sans-serif;
+            border: none;
+            width: 100%;
+        }
+        
+        .whatsapp-btn:hover { background-color: #1ebe57; }
+
+        .fail-msg { color: var(--dp-bright-red); font-size: 1.2rem; font-weight: bold; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="mask-icon">⚔️</span>
+        
+        <!-- INICIO -->
+        <div id="start-screen">
+            <h1>Trivia Deadpool</h1>
+            <p>5 Preguntas. 20 Segundos cada una.</p>
+            <p style="color: #aaa;">Si te equivocas o se acaba el tiempo, pierdes.</p>
+            <button onclick="startGame()" style="width: 100%; font-size: 1.2rem; margin-top: 20px;">
+                ¡ESFUERZO MÁXIMO!
+            </button>
+        </div>
+
+        <!-- JUEGO -->
+        <div id="game-screen" class="hide">
+            <div style="display: flex; justify-content: space-between; color: #888; font-size: 0.9rem;">
+                <span>Progreso: <span id="q-current">1</span>/5</span>
+                <span>Tiempo: <span id="time-left">20</span>s</span>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+
+            <div class="question-box">
+                <span id="question-text">Cargando pregunta...</span>
+            </div>
+
+            <div id="answer-buttons" class="btn-grid">
+                <!-- Botones generados por JS -->
+            </div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div id="result-screen" class="hide">
+            <h1 id="result-title"></h1>
+            <p id="result-message"></p>
+
+            <!-- GANA -->
+            <div id="winner-section" class="hide">
+                <div class="prize-box">
+                    <p>🏆 ¡COMPROBANTE DE VICTORIA!</p>
+                    <div class="winner-code" id="final-code">-----</div>
+                    <p style="font-size: 0.8rem; color: #aaa;">Envía este código ahora mismo:</p>
+                    <a id="wa-link" href="#" target="_blank" class="whatsapp-btn">
+                        RECLAMAR PREMIO AL WHATSAPP 📱
+                    </a>
+                </div>
+            </div>
+
+            <!-- PIERDE -->
+            <div id="loser-section" class="hide">
+                <button onclick="startGame()" style="width: 100%; margin-top: 20px;">Reintentar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN
+        // Nota: Para la API de Argentina se usa 549 + codigo area + numero
+        const PHONE_NUMBER = "5493814471711"; 
+        const SECONDS_PER_QUESTION = 20;
+
+        const questions = [
+            {
+                q: "¿Quién es la compañera de cuarto ciega de Deadpool?",
+                a: [{text: "Blind Mary", c: false}, {text: "Blind Al", c: true}, {text: "Tía May", c: false}, {text: "Madame Web", c: false}]
+            },
+            {
+                q: "¿Qué objeto busca Deadpool al final de la primera película?",
+                a: [{text: "Su billetera", c: false}, {text: "El unicornio de peluche", c: true}, {text: "Una chimichanga", c: false}, {text: "Las Gemas del Infinito", c: false}]
+            },
+            {
+                q: "¿Cómo se llama el grupo que forma Deadpool en la secuela?",
+                a: [{text: "X-Men", c: false}, {text: "Los Vengadores", c: false}, {text: "X-Force", c: true}, {text: "Suicide Squad", c: false}]
+            },
+            {
+                q: "¿Cuál es el verdadero nombre de Cable?",
+                a: [{text: "Nathan Summers", c: true}, {text: "Scott Summers", c: false}, {text: "Jean Grey", c: false}, {text: "Thanos", c: false}]
+            },
+            {
+                q: "¿Quién interpreta a Deadpool?",
+                a: [{text: "Hugh Jackman", c: false}, {text: "Ryan Gosling", c: false}, {text: "Ryan Reynolds", c: true}, {text: "Chris Evans", c: false}]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let timer;
+        let timeLeft;
+
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const answerButtons = document.getElementById('answer-buttons');
+        const qCurrent = document.getElementById('q-current');
+        const timeDisplay = document.getElementById('time-left');
+        const timerBar = document.getElementById('timer-bar');
+        const waLink = document.getElementById('wa-link');
+        const finalCode = document.getElementById('final-code');
+
+        function startGame() {
+            startScreen.classList.add('hide');
+            resultScreen.classList.add('hide');
+            gameScreen.classList.remove('hide');
+            currentQuestionIndex = 0;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            resetState();
+            showQuestion(questions[currentQuestionIndex]);
+            startTimer();
+            qCurrent.innerText = currentQuestionIndex + 1;
+        }
+
+        function showQuestion(question) {
+            questionText.innerText = question.q;
+            // Mezclar respuestas para que no estén siempre en el mismo orden
+            const shuffledAnswers = question.a.sort(() => Math.random() - 0.5);
+            
+            shuffledAnswers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.text;
+                if (answer.c) button.dataset.correct = answer.c;
+                button.addEventListener('click', selectAnswer);
+                answerButtons.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            clearInterval(timer);
+            while (answerButtons.firstChild) {
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+            document.body.style.backgroundColor = "";
+            timerBar.style.width = "100%";
+            timerBar.style.backgroundColor = "#ff0000";
+        }
+
+        function startTimer() {
+            timeLeft = SECONDS_PER_QUESTION;
+            timeDisplay.innerText = timeLeft;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timeDisplay.innerText = timeLeft;
+                
+                // Actualizar barra visual
+                const percentage = (timeLeft / SECONDS_PER_QUESTION) * 100;
+                timerBar.style.width = percentage + "%";
+
+                if (timeLeft <= 5) {
+                    timerBar.style.backgroundColor = "#fff"; // Parpadeo final
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    gameOver(false, "¡Se acabó el tiempo!");
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.target;
+            const isCorrect = selectedBtn.dataset.correct === "true";
+
+            if (isCorrect) {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    nextQuestion();
+                } else {
+                    gameOver(true);
+                }
+            } else {
+                gameOver(false, "Respuesta incorrecta.");
+            }
+        }
+
+        function gameOver(win, msg = "") {
+            clearInterval(timer);
+            gameScreen.classList.add('hide');
+            resultScreen.classList.remove('hide');
+            
+            const title = document.getElementById('result-title');
+            const message = document.getElementById('result-message');
+            const winSection = document.getElementById('winner-section');
+            const loseSection = document.getElementById('loser-section');
+
+            if (win) {
+                title.innerText = "¡MISIÓN CUMPLIDA!";
+                title.style.color = "#4caf50";
+                message.innerText = "Has sobrevivido a la trivia.";
+                
+                // Generar código
+                const code = "DP" + Math.floor(1000 + Math.random() * 9000) + "-WIN";
+                finalCode.innerText = code;
+                
+                // Configurar WhatsApp
+                const waMsg = `¡Hola! Gané la trivia de Deadpool SIN ERRORES. 🦸‍♂️\nMi código de victoria es: *${code}*\nQuiero reclamar mi premio.`;
+                waLink.href = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+                
+                winSection.classList.remove('hide');
+                loseSection.classList.add('hide');
+            } else {
+                title.innerText = "¡GAME OVER!";
+                title.style.color = "#ff0000";
+                message.innerText = msg + " Francis está decepcionado.";
+                message.classList.add('fail-msg');
+                
+                winSection.classList.add('hide');
+                loseSection.classList.remove('hide');
+            }
+        }
+    </script>
+</body>
+</html>
