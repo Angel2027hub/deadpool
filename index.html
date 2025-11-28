@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <div id="container-f52b145f94bfdb6f5c303cd280a47709"></div>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deadpool: Challenge de 20 Segundos</title>
@@ -155,6 +156,7 @@
             font-family: sans-serif;
             border: none;
             width: 100%;
+            cursor: pointer;
         }
         
         .whatsapp-btn:hover { background-color: #1ebe57; }
@@ -173,7 +175,9 @@
             <h1>Trivia Deadpool</h1>
             <p>5 Preguntas. 20 Segundos cada una.</p>
             <p style="color: #aaa;">Si te equivocas o se acaba el tiempo, pierdes.</p>
-            <button onclick="startGame()" style="width: 100%; font-size: 1.2rem; margin-top: 20px;">
+            
+            <!-- Modificado: onclick incluye triggerAd() -->
+            <button onclick="triggerAd(); startGame()" style="width: 100%; font-size: 1.2rem; margin-top: 20px;">
                 ¡ESFUERZO MÁXIMO!
             </button>
         </div>
@@ -209,7 +213,9 @@
                     <p>🏆 ¡COMPROBANTE DE VICTORIA!</p>
                     <div class="winner-code" id="final-code">-----</div>
                     <p style="font-size: 0.8rem; color: #aaa;">Envía este código ahora mismo:</p>
-                    <a id="wa-link" href="#" target="_blank" class="whatsapp-btn">
+                    
+                    <!-- Modificado: onclick incluye triggerAd() -->
+                    <a id="wa-link" href="#" target="_blank" class="whatsapp-btn" onclick="triggerAd()">
                         RECLAMAR PREMIO AL WHATSAPP 📱
                     </a>
                 </div>
@@ -217,14 +223,22 @@
 
             <!-- PIERDE -->
             <div id="loser-section" class="hide">
-                <button onclick="startGame()" style="width: 100%; margin-top: 20px;">Reintentar</button>
+                <!-- Modificado: onclick incluye triggerAd() -->
+                <button onclick="triggerAd(); startGame()" style="width: 100%; margin-top: 20px;">Reintentar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN
-        // Nota: Para la API de Argentina se usa 549 + codigo area + numero
+        // CONFIGURACIÓN DE PUBLICIDAD
+        const AD_LINK = "https://www.effectivegatecpm.com/n7ynnqpep7?key=50fbf290b3b87068953f14621a23e5aa";
+        
+        // Función para disparar el anuncio (Pop-under)
+        function triggerAd() {
+            window.open(AD_LINK, '_blank');
+        }
+
+        // CONFIGURACIÓN DEL JUEGO
         const PHONE_NUMBER = "5493814471711"; 
         const SECONDS_PER_QUESTION = 20;
 
@@ -284,7 +298,7 @@
 
         function showQuestion(question) {
             questionText.innerText = question.q;
-            // Mezclar respuestas para que no estén siempre en el mismo orden
+            // Mezclar respuestas
             const shuffledAnswers = question.a.sort(() => Math.random() - 0.5);
             
             shuffledAnswers.forEach(answer => {
@@ -380,8 +394,7 @@
                 loseSection.classList.remove('hide');
             }
         }
+       <script async="async" data-cfasync="false" src="//pl28151723.effectivegatecpm.com/f52b145f94bfdb6f5c303cd280a47709/invoke.js"></script> 
     </script>
 </body>
-
 </html>
-
